@@ -4,18 +4,60 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 //initialise
 //dest - kyde da se uploudva
-const upload = multer({dest: 'uploads/'});
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads/');
+    },
+    filename: function(req, file, cb) {
+        // set name of file
+        cb(null, file.originalname)
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    //reject a file
+    if ( file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' ) {
+        cb(new Error('File not stored'), true);
+    } else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter: fileFilter
+});
 
 const Product = require('../models/product')
 
 router.get('/', (req, res, next) => {
     
     Product.find()
-        .select('name price _id')
+        .select('name price _id file')
         .exec()
         .then( docs => {
-            console.log(docs);
-            res.status(200).json(docs);
+            const response = {
+                count: docs.length,
+                products: docs.map( doc => {
+                    return {
+                        price: doc.price,
+                        file: doc.file,
+                        _id: doc._id,
+                        request: {
+                            type: 'GET'
+                        }
+                    }
+                })
+            }
+            res.status(200).json(response);
+
+            // old code
+            // console.log(docs);
+            // res.status(200).json(docs);
         })
         .catch(err => {
             console.log(err);
@@ -36,7 +78,8 @@ router.post('/', upload.single('file'), (req, res, next) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        price: req.body.price
+        price: req.body.price,
+        file: req.file.path
     });
     //exec() - like promise drugiq na4in e da izvikam callback funct in save(...)
     product
@@ -65,7 +108,9 @@ router.post('/', upload.single('file'), (req, res, next) => {
 
 router.get('/:productId', (req, res, next) => {
     const id = req.params.productId;
-    Product.findById(id).exec()
+    Product.findById(id)
+    .select('name price _id file')
+    .exec()
     .then( doc => {
         console.log(doc);
         if ( doc ) {

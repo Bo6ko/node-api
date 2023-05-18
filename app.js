@@ -10,6 +10,8 @@ const orderRoutes = require('./api/routes/orders');
 mongoose.connect('mongodb+srv://bshopov:' + process.env.MONGO_ATLAS_PW + '@cluster0.shle3qk.mongodb.net/?retryWrites=true&w=majority')
 
 app.use(morgan('dev'));
+// to see this uploaded files in the browser
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
