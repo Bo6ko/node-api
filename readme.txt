@@ -64,3 +64,25 @@ const multer = require('multer');
 const upload = multer({dest: 'uploads/'});
 
 ----------
+
+1. Statelessness
+As per the REST (REpresentational “State” Transfer) architecture, 
+the server does not store any state about the client session on the server-side. 
+This restriction is called Statelessness.
+
+https://restfulapi.net/statelessness/
+
+statelessness - pri login servera vra6ta danni tezi danni mogat da se pazqt v sessiq
+ako e normal node app
+no ako e restful services 6te izpolzvame token za6toto te restful services sa stateless
+
+tokena e kato podpis za podrebitelq 4e se e lognal - toi se zapazva na stranata na potrebitelq
+i tokena moje da se izpolzva pri sledva6ti zaqvki kym syrwyra toest da se izpolzva tozi podpis
+na potrebiltelq
+
+
+-------------
+
+cript password using bcrypt
+
+npm install bcrypt
