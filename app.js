@@ -20,6 +20,7 @@ mongoose
 app.use(morgan('dev'));
 // to see this uploaded files in the browser
 app.use('/uploads', express.static('uploads'));
+// use middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
