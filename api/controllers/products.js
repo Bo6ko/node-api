@@ -13,23 +13,43 @@ exports.products_get_all = /*async*/ (req, res, next) => {
     // }
     
     Product.find()
-        .select('name price _id file')
+        .select('_id userId name price file')
         .exec()
         .then( docs => {
-            const response = {
-                count: docs.length,
-                products: docs.map( doc => {
-                    return {
-                        price: doc.price,
-                        file: doc.file,
-                        _id: doc._id,
-                        request: {
-                            type: 'GET'
+            if ( req.userData.role === 'admin' ) {
+                const response = {
+                    count: docs.length,
+                    products: docs.map( doc => {
+                        return {
+                            _id: doc._id,
+                            userId: doc.userId,
+                            price: doc.price,
+                            file: doc.file,                        
+                            request: {
+                                type: 'GET'
+                            }
                         }
-                    }
-                })
+                    })
+                }
+                res.status(200).json(response);
+            } else {
+                const filteredDoc = docs.filter(filteredDoc => filteredDoc.userId === req.userData.userId)
+                const response = {
+                    count: filteredDoc.length,
+                    products: filteredDoc.map( doc => {
+                        return {
+                            _id: doc._id,
+                            userId: doc.userId,
+                            price: doc.price,
+                            file: doc.file,                        
+                            request: {
+                                type: 'GET'
+                            }
+                        }
+                    })
+                }
+                res.status(200).json(response);
             }
-            res.status(200).json(response);
 
             // old code
             // console.log(docs);
@@ -52,6 +72,7 @@ exports.products_create_product = /* async */(req, res, next) => {
     console.log('req.file', req.file)
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
+        userId: req.body.userId,
         name: req.body.name,
         price: req.body.price,
         file: req.file.path
@@ -148,7 +169,27 @@ exports.products_update_product = (req, res, next) => {
 
 exports.products_delete_product = (req, res, next) => {
     const id = req.params.productId;
-    Product.remove({_id: id}).exec()
+    Product.remove({_id: id})
+        .exec()
+        .then( result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            })
+        })
+
+    //old code
+    // res.status(200).json({
+    //     message: 'Deleted product!'
+    // })
+}
+
+exports.products_delete_all = (req, res, next) => {
+    Product.deleteMany()
+        .exec()
         .then( result => {
             res.status(200).json(result)
         })
