@@ -4,6 +4,34 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
+exports.user_get_all = (req, res, next) => {
+    User.find()
+        .select('email role _id')
+        .exec()
+        .then( docs => {
+            const response = {
+                count: docs.length,
+                products: docs.map( doc => {
+                    return {
+                        email: doc.email,
+                        role: doc.role,
+                        _id: doc._id,
+                        request: {
+                            type: 'GET'
+                        }
+                    }
+                })
+            }
+            res.status(200).json(response);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            })
+        })
+}
+
 exports.user_signup = (req, res, next) => {
     User.find({email: req.body.email})
     .exec()
@@ -23,6 +51,7 @@ exports.user_signup = (req, res, next) => {
                     const user = new User({
                         _id: new mongoose.Types.ObjectId(),
                         email: req.body.email,
+                        role: req.body.role,
                         password: hash
                     });
                     user
@@ -65,7 +94,8 @@ exports.user_login = (req, res, next) => {
                 const token = jwt.sign(
                     {
                         email: user[0].email,
-                        userId: user[0]._id
+                        userId: user[0]._id,
+                        role: user[0].role
                     }, 
                     process.env.JWT_KEY,
                     {
@@ -91,7 +121,8 @@ exports.user_login = (req, res, next) => {
 }
 
 exports.user_delete = (req, res, next) => {
-    User.remove({_id: req.params.userId})
+    // User.deleteMany() delete all
+    User.deleteOne({_id: req.params.userId})
         .exec()
         .then( result => {
             res.status(200).json({
