@@ -4,7 +4,11 @@ const mongoose = require('mongoose');
 const productSchema = mongoose.Schema(
     {
         _id: mongoose.Schema.Types.ObjectId,
-        userId: { type: String, required: true },
+        userId: { 
+            type: String, 
+            required: true,
+            ref: "User"
+        },
         name: { type: String, required: true },
         price: { type: Number, required: true },
         file: { type: String, requred: true }

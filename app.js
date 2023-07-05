@@ -2,25 +2,26 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
+require('dotenv').config();
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 
-mongoose
-.connect('mongodb+srv://bshopov:' + process.env.MONGO_ATLAS_PW + '@cluster0.shle3qk.mongodb.net/?retryWrites=true&w=majority')
-.then(() => {
-    console.log('connect to MongoDB')
-})
-.catch((error) => {
-    console.log(error)
-})
+// mongoose
+// .connect('mongodb+srv://bshopov:' + process.env.MONGO_ATLAS_PW + '@cluster0.shle3qk.mongodb.net/?retryWrites=true&w=majority')
+// .then(() => {
+//     console.log('connect to MongoDB')
+// })
+// .catch((error) => {
+//     console.log(error)
+// })
 
+// key word use also is for middleware
 app.use(morgan('dev'));
 // to see this uploaded files in the browser
 app.use('/uploads', express.static('uploads'));
-// use middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -47,7 +48,7 @@ app.use((req, res, next) => {
 
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
-app.use('/user', userRoutes);
+app.use('/', userRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');

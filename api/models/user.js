@@ -1,20 +1,33 @@
-const mongoose = require('mongoose');
+const db = require('../../database/db_connection');
+const TABLE = 'users';
 
-const userSchema = mongoose.Schema(
-    {
-        _id: mongoose.Schema.Types.ObjectId,
-        email: { 
-            type: String, 
-            require: true, 
-            unique: true, 
-            match:  /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
-        },
-        password: { type: String, required: true },
-        role: { type: String, required: true }
+const User = {
+    getAllUsers: (callback) => {
+        const sql = `select * from ${TABLE}`;
+        const res = db.query(sql, callback);
     },
-    {
-        timestamps: true
-    }
-);
+    userSignup: (user, callback) => {
+        const checkUserQuery = 'SELECT * FROM users WHERE email = ?';
+        db.query(checkUserQuery, [user.email], (error, results) => {
+            if (error) {
+                callback(error);
+                return;
+            }
+            if (results.length > 0) {
+                // User with the same username or email already exists
+                callback('User already exists');
+                return;
+            }
+            const insertUserQuery = 'INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)';
+                db.query(insertUserQuery, [user.first_name, user.last_name, user.email, user.password, user.role], (error, results) => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+                callback(null, results.insertId);
+            });
+        });
+    },
+}
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

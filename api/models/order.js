@@ -10,7 +10,11 @@ const orderSchema = mongoose.Schema(
         _id: mongoose.Schema.Types.ObjectId,
         // I want to kwno which product i order - ref use
         // ref 'Product' comming from here module.exports = mongoose.model('Product', productSchema);
-        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        product: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Product', 
+            required: true 
+         },
         quantity: { type: Number, default: 1 }
     },
     {

@@ -4,72 +4,34 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
-exports.user_get_all = (req, res, next) => {
-    User.find()
-        .select('email role _id')
-        .exec()
-        .then( docs => {
-            const response = {
-                count: docs.length,
-                products: docs.map( doc => {
-                    return {
-                        email: doc.email,
-                        role: doc.role,
-                        _id: doc._id,
-                        request: {
-                            type: 'GET'
-                        }
-                    }
-                })
-            }
-            res.status(200).json(response);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({
-                error: err
-            })
-        })
+exports.getAllUsers = (req, res, next) => {
+    User.getAllUsers((err, results) => {
+        if(err) {
+            console.log('Error retrieving users:', err);
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(results);
+        }
+    })
 }
 
-exports.user_signup = (req, res, next) => {
-    User.find({email: req.body.email})
-    .exec()
-    .then(user => {
-        if ( user.length >= 1 ) {
-            //409 means conflict or 422
-            return res.status(409).json({
-                message: 'Mail exists'
-            })
+exports.userSignup = (req, res, next) => {
+    const user = req.body;
+
+    // Perform email validation
+    if (!isValidEmail(user.email)) {
+        res.status(400).json({ error: 'Invalid email' });
+        return;
+    }
+
+    User.userSignup(user, (err, results) => {
+        if(err) {
+            console.error('Error creating user: ', err);
+            //409 means conflict or 422 - for example if email exists
+            res.status(500).json({ error: 'Failed to create user' });
         } else {
-            bcrypt.hash(req.body.password, 10, (err, hash) => {
-                if ( err ) {
-                    return res.status(500).json({
-                        error: err
-                    });
-                } else {
-                    const user = new User({
-                        _id: new mongoose.Types.ObjectId(),
-                        email: req.body.email,
-                        role: req.body.role,
-                        password: hash
-                    });
-                    user
-                        .save()
-                        .then( result => {
-                            console.log(result)
-                            res.status(201).json({
-                                message: 'User created'
-                            })
-                        } )
-                        .catch(err => {
-                            console.log('err', err);
-                            res.status(500).json({
-                                error: err
-                            })
-                        });
-                }
-            })
+            const newUser = {...{id: results}, ...user};
+            res.status(201).json(newUser);
         }
     })
 }
@@ -136,3 +98,9 @@ exports.user_delete = (req, res, next) => {
             })
         });
 }
+
+// Email validation function
+const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};

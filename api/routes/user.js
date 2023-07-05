@@ -5,12 +5,12 @@ const { userRole } = require('../middleware/user-role');
 
 const UserController = require('../controllers/user')
 
-router.get('/', checkAuth, UserController.user_get_all);
+router.get('/users', UserController.getAllUsers);
 
-router.post('/signup', UserController.user_signup);
+router.post('/user/signup', UserController.userSignup);
 
-router.post("/login", UserController.user_login)
+router.post("/user/login", UserController.user_login)
 
-router.delete('/:userId', userRole('admin'), UserController.user_delete);
+router.delete('/user/:userId', userRole('admin'), UserController.user_delete);
 
 module.exports = router;
