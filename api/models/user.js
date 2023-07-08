@@ -2,12 +2,12 @@ const db = require('../../database/db_connection');
 const TABLE = 'users';
 
 const User = {
-    getAllUsers: (callback) => {
+    getAll: (callback) => {
         const sql = `select * from ${TABLE}`;
-        const res = db.query(sql, callback);
+        db.query(sql, callback);
     },
-    userSignup: (user, callback) => {
-        const checkUserQuery = 'SELECT * FROM users WHERE email = ?';
+    signup: (user, callback) => {
+        const checkUserQuery = `SELECT * FROM ${TABLE} WHERE email = ?`;
         db.query(checkUserQuery, [user.email], (error, results) => {
             if (error) {
                 callback(error);
@@ -18,7 +18,7 @@ const User = {
                 callback('User already exists');
                 return;
             }
-            const insertUserQuery = 'INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)';
+            const insertUserQuery = `INSERT INTO ${TABLE} (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)`;
                 db.query(insertUserQuery, [user.first_name, user.last_name, user.email, user.password, user.role], (error, results) => {
                 if (error) {
                     callback(error);
@@ -27,6 +27,14 @@ const User = {
                 callback(null, results.insertId);
             });
         });
+    },
+    login: (user, callback) => {
+        const findUser = `SELECT * FROM ${TABLE} WHERE email = ?`;
+        db.query(findUser, [user.email], callback);
+    },
+    delete: (user, callback) => {
+        const deleteUser = `DELETE FROM ${TABLE} WHERE id = ?;`;
+        db.query(deleteUser, [user.id], callback(null, {message: `User id ${user.id} was deleted!`}));
     },
 }
 
