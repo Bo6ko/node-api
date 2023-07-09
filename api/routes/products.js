@@ -33,15 +33,14 @@ const upload = multer({
     // fileFilter: fileFilter
 });
 
-router.get('/', checkAuth, ProductsController.products_get_all);
+router.get('/', checkAuth, ProductsController.getAllByUserId);
 
-router.post('/', checkAuth, upload.single('file'), ProductsController.products_create_product);
+router.post('/', checkAuth, upload.single('file'), ProductsController.create);
 
-router.get('/:productId', ProductsController.products_get_product);
+router.get('/:id', checkAuth, ProductsController.getById);
 
-router.patch('/:productId', checkAuth, ProductsController.products_update_product);
+router.put('/:id', checkAuth, ProductsController.update);
 
-router.delete('/:productId', checkAuth, ProductsController.products_delete_product);
-router.delete('/', checkAuth, userRole('admin'), ProductsController.products_delete_all);
+router.delete('/:id', checkAuth, ProductsController.delete);
 
 module.exports = router;

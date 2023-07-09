@@ -5,7 +5,7 @@ const create_users = `CREATE table IF NOT EXISTS users (
     email VARCHAR(80) NOT NULL UNIQUE,
 	password VARCHAR(255),
     role VARCHAR(40),
-	created_at DATETIME,
+	created_at DATETIME DEFAULT NOW(),
 	updated_at TIMESTAMP
 )`;
 

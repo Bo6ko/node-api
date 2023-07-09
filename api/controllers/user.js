@@ -62,8 +62,8 @@ exports.login = (req, res, next) => {
                     // https://jwt.io/ - you can read the token information
                     const token = jwt.sign(
                         {
-                            email: results[0].email,
-                            userId: results[0].id,
+                            id: results[0].id,
+                            email: results[0].email,                            
                             role: results[0].role
                         }, 
                         process.env.JWT_KEY,

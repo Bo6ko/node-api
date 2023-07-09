@@ -19,7 +19,7 @@ const User = {
                 return;
             }
             const insertUserQuery = `INSERT INTO ${TABLE} (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)`;
-                db.query(insertUserQuery, [user.first_name, user.last_name, user.email, user.password, user.role], (error, results) => {
+            db.query(insertUserQuery, [user.first_name, user.last_name, user.email, user.password, user.role], (error, results) => {
                 if (error) {
                     callback(error);
                     return;
