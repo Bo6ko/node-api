@@ -39,7 +39,7 @@ router.post('/', checkAuth, upload.single('file'), ProductsController.create);
 
 router.get('/:id', checkAuth, ProductsController.getById);
 
-router.put('/:id', checkAuth, ProductsController.update);
+router.put('/:id', checkAuth, upload.single('file'), ProductsController.update);
 
 router.delete('/:id', checkAuth, ProductsController.delete);
 
