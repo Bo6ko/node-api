@@ -50,7 +50,6 @@ exports.update = (req, res, next) => {
             res.status(500).json({ error: 'Failed to update product' });
         } else {
             const newProduct = {
-                ...{id: req.params.id}, 
                 ...{user_id: req.userData.id}, 
                 ...{file: (req.file && req.file.path) ? req.file.path : ''}, 
                 ...product

@@ -27,11 +27,10 @@ const Product = {
         const product = data.body;
         const user = data.userData;
         const file = (data.file && data.file.path) ? data.file.path : '';
-        const productId = data.params.id;
         const updateUserQuery = `UPDATE ${TABLE} SET name = ?, price = ?, quantity = ?, file = ? WHERE id = ? and user_id = ?`;
         db.query(
             updateUserQuery, 
-            [product.name, product.price, product.quantity, file, productId, user.id], 
+            [product.name, product.price, product.quantity, file, product.id, user.id], 
             (error, results) => {
                 if (error) {
                     callback(error);
@@ -44,7 +43,13 @@ const Product = {
     delete: (data, callback) => {
         const productId = data.params.id;
         const deleteProduct = `DELETE FROM ${TABLE} WHERE id = ? and user_id = ?;`;
-        db.query(deleteProduct, [productId, data.userData.id], callback(null, {message: `product id ${productId} was deleted!`}));
+        db.query(deleteProduct, [productId, data.userData.id], (error, results) => {
+            if (error) {
+                callback(error);
+                return;
+            } 
+            callback(null, {message: `product id ${productId} was deleted!`})
+        });
     },
 }
 
